@@ -1,0 +1,20 @@
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\bin\Debug\TohoSTG.exe
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\bin\Debug\TohoSTG.pdb
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\TohoSTG.Form1.resources
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\TohoSTG.Properties.Resources.resources
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\TohoSTG.exe
+C:\Users\s\AppData\Local\Temporary Projects\TohoSTG\obj\x86\Debug\TohoSTG.pdb
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\TohoSTG.exe
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\TohoSTG.pdb
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\bin\Debug\TohoSTG.exe
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\bin\Debug\TohoSTG.pdb
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\TohoSTG.Form1.resources
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\TohoSTG.Properties.Resources.resources
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\s\documents\visual studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\Interop.WMPLib.dll
+C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\obj\x86\Debug\TohoSTG.csproj.ResolveComReference.cache
