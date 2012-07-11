@@ -12,6 +12,9 @@ namespace TohoSTG
         private Bitmap bmp;
         private int width;
         private int height;
+        private int screenWidth;
+        private int screenHeight;
+
         public int Width
         {
             get
@@ -30,10 +33,13 @@ namespace TohoSTG
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分
 
-        public Jiki(double x, double y)
+        public Jiki(double x, double y, int screenWidth, int screenHeight)
         {
             this.x = x;
             this.y = y;
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
+
             bmp = new Bitmap(BMPFileName);
             width = bmp.Width;
             height = bmp.Height;
@@ -67,7 +73,7 @@ namespace TohoSTG
         {
             int dx = 0;
             int dy = 0;
-            int d = 2;
+            int d = 6;      // 自機の速度
 
             dx += padState.osareteru(PadState.Buttons.left) ? -d : 0;
             dx += padState.osareteru(PadState.Buttons.right) ? +d : 0;
@@ -79,6 +85,12 @@ namespace TohoSTG
             //if (e.KeyCode == Keys.S) j1.difference(0, +1);
             x += dx;
             y += dy;
+
+            if (x < 0) x = 0;   // 画面左端からはみ出させない
+            if (x > screenWidth - width) x = screenWidth - width;       // 画面右端からはみ出させない
+            if (y < 0) y = 0;   // 画面上端からはみ出させない
+            if (y > screenHeight - height) y = screenHeight - height;   // 画面下端からはみ出させない
+
             //throw new NotImplementedException();
         }
     }

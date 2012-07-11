@@ -17,6 +17,7 @@ namespace TohoSTG
             down = System.Windows.Forms.Keys.S,
             button1 = System.Windows.Forms.Keys.Space,
             //button2,
+            reset,
         }
 
         public PadState()
@@ -32,6 +33,7 @@ namespace TohoSTG
             this.Add(Buttons.down, false);
 
             this.Add(Buttons.button1, false);
+            this.Add(Buttons.reset, false);
 
             osaretaInt = new Dictionary<Buttons, bool>();
             osaretaInt[Buttons.left] = false;
@@ -39,6 +41,7 @@ namespace TohoSTG
             osaretaInt[Buttons.up] = false;
             osaretaInt[Buttons.down] = false;
             osaretaInt[Buttons.button1] = false;
+            osaretaInt[Buttons.reset] = false;
         }
 
         // ぼくたちはこの関数の名前をまだ知らない
@@ -55,6 +58,7 @@ namespace TohoSTG
             if (e.KeyCode == System.Windows.Forms.Keys.W) funcA(Buttons.up);
             if (e.KeyCode == System.Windows.Forms.Keys.S) funcA(Buttons.down);
             if (e.KeyCode == System.Windows.Forms.Keys.Space) funcA(Buttons.button1);
+            if (e.KeyCode == System.Windows.Forms.Keys.Z) funcA(Buttons.reset);
         }
 
         internal void KeyUp(KeyEventArgs e)
@@ -64,10 +68,18 @@ namespace TohoSTG
             if (e.KeyCode == System.Windows.Forms.Keys.W) this[Buttons.up] = false;
             if (e.KeyCode == System.Windows.Forms.Keys.S) this[Buttons.down] = false;
             if (e.KeyCode == System.Windows.Forms.Keys.Space) this[Buttons.button1] = false;
+            if (e.KeyCode == System.Windows.Forms.Keys.Z) this[Buttons.reset] = false;
         }
 
         internal bool 押された(Buttons b)
         {
+#if DEBUG
+            if (osaretaInt[b])
+            {
+                /* do nothing */;
+            }
+#endif
+
             return osaretaInt[b];
         }
 

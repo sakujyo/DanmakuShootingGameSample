@@ -28,12 +28,20 @@ namespace TohoSTG
         //private Dictionary<Keys, bool> isPressed;
         private PadState padState;
         private List<Enemy> enemies;
-        const int INTERVAL = 25;
+        const int INTERVAL = 33;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        private int score;
+        private int RotationPhase;
+        //private DateTime t0;
+        private List<TimeSpan> stagetime;
+        private List<DateTime> startedTime;
 
         private void reset()
         {
-            j1 = new Jiki(240, 260);    // 初期位置はてきとー
+            j1 = new Jiki(240, 260, width, height);    // 初期位置はてきとー
             isAlive = true;
+
+            score = 0;
+            RotationPhase = 0;
 
             padState = new PadState();
             //isPressed = new Dictionary<Keys, bool>();
@@ -45,6 +53,12 @@ namespace TohoSTG
             bullets = new List<Bullet>();   // 弾幕プールの1グループ
             enemies = new List<Enemy>();    // 敵の一味
             timer1.Interval = INTERVAL;   // ミリ秒
+            stagetime = new List<TimeSpan>();
+            startedTime = new List<DateTime>();
+            startedTime.Add(DateTime.Now);
+            //startedTime[0] = DateTime.Now;    // まだないなら変更できない
+            //t0 = DateTime.Now;
+
             timer1.Start();
         }
 
@@ -94,18 +108,42 @@ namespace TohoSTG
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
-            if (isAlive == false) return;
-
-            //if (r.Next(100) == 0)
-            if (r.Next(40) == 0)
+            if (padState.押された(PadState.Buttons.reset)) reset();
+            if (isAlive == false)
             {
-                int x = width / 4 + r.Next(2 * width / 4);
-                int y = height/ 4 + r.Next(2 * height/ 4);
+                timer1.Start();
+                return;
+            }
+
+            // 弾幕の生成
+            //if (r.Next(100) == 0)
+            //Func<Enemy> a = ((Enemy x) => x.IsAlive && x.Y > height * 0.8);
+            var e2 = enemies.FindAll(x => x.IsAlive && x.Y < height * 0.6);
+            if (r.Next(20) == 0 && e2.Count > 0)   // 敵がいないとRandomが0を返すので
+            {
+                //int index = r.Next(0);  // 弾幕を出す敵の抽選
+                bool isAliveEnemy = false;
+                Enemy enemy;
+                do
+                {
+                    int index = r.Next(e2.Count);  // 弾幕を出す敵の抽選
+                    enemy = e2[index];
+                    isAliveEnemy = enemy.IsAlive;
+                } while (isAliveEnemy == false);
+                int x = (int)enemy.X;
+                int y = (int)enemy.Y;
+
+                //int x = width / 4 + r.Next(2 * width / 4);
+                //int y = height/ 4 + r.Next(2 * height/ 4);
 
                 //int num = 17;
                 //int num = 37;
                 int num = 29;
-                double constant = 1.5;
+                //double constant = 1.5;  // 弾丸の速度
+                
+                //double constant = 6;  // 弾丸の速度
+                double constant = 4 + r.Next(4);  // 弾丸の速度、ばらつきを持たせてみた
+                
                 for (int i = 0; i < num; i++)
                 {
                     //Bullet b = new Bullet(150, 100, Math.Pow(-1.0, (double)i), 2.7);
@@ -115,31 +153,38 @@ namespace TohoSTG
                     b.draw(this, g);
                 }
             }
-            if (r.Next(40) == 0)
+            if (r.Next(20) == 0)
             // 敵の誕生
             {
-                Enemy enemy = new Enemy(10, 10);
+                int ix = r.Next(width + 32) - 24;
+                Enemy enemy = new Enemy(ix, -16, 0, 8);    // 引数は出現位置
                 enemies.Add(enemy);
             }
 
             //g.Clear(Color.White);
             //g.Clear(Color.Black);
-            g.DrawImage(haikei, 0, 0);
+            
+            // TODO: 背景画像でテストプレイしにくいので要検討
+            //g.DrawImage(haikei, 0, 0);
+            g.Clear(Color.Black);
+
             //j1.move(isPressed);
 
             if (padState.押された(PadState.Buttons.button1))
             {
-                Bullet b = new Bullet(Bullet.Sides.mikata, j1.X + j1.Width / 2, j1.Y, 0, -4);
+                int myBulletSpeed = -8;
+                Bullet b = new Bullet(Bullet.Sides.mikata, j1.X + j1.Width / 2, j1.Y, 0, myBulletSpeed);
                 bullets.Add(b);
                 padState.clearPressed(PadState.Buttons.button1);
             }
             j1.move(padState);
             j1.draw(g);
 
-            // 自他問わず弾丸の移動と描画と当たり判定
+            // 敵味方問わず弾丸の移動と描画と当たり判定
             foreach (var bullet in bullets)
             {
                 //item.zanzou(this, g);
+                //bullet.move(new Point(width / 2, height / 2));
                 bullet.move();
                 bullet.draw(this, g);
                 switch (bullet.Side)
@@ -161,6 +206,8 @@ namespace TohoSTG
                             if (bullet.inquire(enemy))
                             {
                                 enemy.die();
+                                score += 100;
+                                //stagetime[1 + score / 2000] = DateTime.Now - t0;
                             }
                         }
                         break;
@@ -170,12 +217,50 @@ namespace TohoSTG
             }
             bullets.RemoveAll(x => x.isFadeOut(width, height));
 
-            foreach (var item in enemies)
+            foreach (var enemy in enemies)
             {
-                item.move();
-                item.draw(g);
+                //width / 2, height / 2
+                int gy = (int)(height / 2 + /*keisu*/40 * Math.Cos(2 * Math.PI * RotationPhase / 60));
+                int gx = (int)(width  / 2 + /*keisu*/100 * Math.Sin(-2 * Math.PI * RotationPhase / 60));
+
+                enemy.move(new Point(gx, gy));
+                enemy.draw(g);
             }
-            
+            enemies.RemoveAll(x => x.isFadeOut(width, height));
+
+            g.DrawString(score.ToString(), DefaultFont, Brushes.White, 16, height - 32);
+
+            int localStageConstant = 2000;
+            if (startedTime.Count > 1 + score / localStageConstant)
+            {
+                startedTime[1 + score / localStageConstant] = DateTime.Now;
+            }
+            else
+            {
+                startedTime.Add(DateTime.Now);
+            }
+            for (int i = 1; i < startedTime.Count; i++)
+			{
+                TimeSpan thisstagetime = (startedTime[i] - startedTime[i - 1]);
+                //TimeSpan thisstagetime = (startedTime[i] - startedTime[i - 1]) - new TimeSpan((startedTime[i] - startedTime[i - 1]).Milliseconds);
+                //string timestring = (startedTime[i] - startedTime[i - 1]).ToString();
+                //g.DrawString(String.Format("Stage {0}: {1}", i, timestring), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
+                g.DrawString(String.Format("Stage {0}: {1}", i, new TimeSpan(thisstagetime.Hours, thisstagetime.Minutes, thisstagetime.Seconds)), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
+                //g.DrawString((startedTime[i] - startedTime[i - 1]).ToString(), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
+			}
+            //foreach (var item in startedTime)
+            //{
+            //    g.DrawString(String.Format("Stage {0}: {1}", startedTime.IndexOf(item), item),                
+            //}
+            ////if (score >= 2000)
+            //if (score >= 200)
+            //{
+
+            //    g.DrawString("Stage 1: " + t.ToString(), DefaultFont, Brushes.White, width - 160, 64);
+
+            //    g.DrawString("Stage 1: " + t.ToString(), DefaultFont, Brushes.White, width - 160, 64);
+            //}
+
             //b1.zanzou(this, g);
             //b1.move();
             //b1.draw(this, g);

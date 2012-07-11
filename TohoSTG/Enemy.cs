@@ -13,6 +13,8 @@ namespace TohoSTG
         private Bitmap bmp;
         private int width;
         private int height;
+        private double ivx;
+        private double ivy;
         public int Width
         {
             get
@@ -31,10 +33,14 @@ namespace TohoSTG
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分
 
-        public Enemy(double x, double y)
+        public Enemy(double x, double y, double ivx, double ivy)
         {
             this.x = x;
             this.y = y;
+            this.ivx = ivx; // 初速x
+            this.ivy = ivy; // 初速y
+            isAlive = true;
+
             bmp = new Bitmap(BMPFileName);
             width = bmp.Width;
             height = bmp.Height;
@@ -48,6 +54,7 @@ namespace TohoSTG
 
         internal Boolean judge(double x, double y)
         {
+            if (isAlive == false) return false;
             // TODO: 敵機の当たり判定のバランスは調整が必要
             if (x < this.x) return false;
             if (x >= this.x + width) return false;
@@ -65,21 +72,50 @@ namespace TohoSTG
         //    //throw new NotImplementedException();
         //}
 
-        internal void move()
+        internal void move(Point gravitySource)
         {
-            int dx = 1; // x方向の速度
-            int dy = 0; // y方向の速度
-            int d = 2;  // 速度係数
+            // 敵の速度を変える処理
+            double gravity = 48.8;  // かなりてきとーな重力定数
+            // 重力源までの距離を求める
+            int dx = (int)x - gravitySource.X;
+            int dy = (int)y - gravitySource.Y;
+            // ピタゴラスの定理
+            int distanceSquare = dx * dx + dy * dy;
+            //double d = Math.Sqrt(dx * dx + dy * dy);
+            if (distanceSquare == 0) distanceSquare = 1;    // ゼロ除算を防ぐため
+            ivx += -dx * gravity / distanceSquare;
+            ivy += -dy * gravity / distanceSquare;
 
-            x += dx;
-            y += dy;
+
+            //int dx = 1; // x方向の速度
+            //int dy = 0; // y方向の速度
+            int d = 1;  // 速度係数
+
+            x += ivx * d;
+            y += ivy * d;
+            //x += dx * d;
+            //y += dy * d;
         }
     
         internal void die()
         {
+            isAlive = false;
             // TODO: 敵機を撃墜したのでBMPを差し替えるなど
             bmp = new Bitmap(BMPMokuzuFileName);
             bmp.MakeTransparent();
+        }
+
+        protected bool isAlive;
+        public bool IsAlive { get { return isAlive; } }
+
+        internal bool isFadeOut(int screenWidth, int screenHeight)
+        {
+            if (x >= screenWidth + 20) return true;
+            if (x < -20) return true;
+            if (y >= screenHeight + 20) return true;
+            if (y < -20) return true;
+
+            return false;
         }
     }
 }

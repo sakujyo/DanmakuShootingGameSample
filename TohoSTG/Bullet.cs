@@ -41,9 +41,18 @@ namespace TohoSTG
 
         internal void draw(Form1 form1, Graphics g)
         {
+            Pen p;
+            if (side == Sides.teki)
+            {
+                p = Pens.LightPink;
+            }
+            else
+            {
+                p = Pens.SkyBlue;
+            }
             // 十字型の弾丸をプログラムで描画
-            g.DrawLine(Pens.LightPink, (float)(x + 1), (float)(y), (float)(x + 1), (float)(y + 2));
-            g.DrawLine(Pens.LightPink, (float)(x), (float)(y + 1), (float)(x + 2), (float)(y + 1));
+            g.DrawLine(p, (float)(x + 1), (float)(y), (float)(x + 1), (float)(y + 2));
+            g.DrawLine(p, (float)(x), (float)(y + 1), (float)(x + 2), (float)(y + 1));
             g.DrawLine(Pens.White, (float)(x + 1), (float)(y + 1), (float)(x + 1), (float)(y + 1));
             
             //g.FillRectangle(Brushes.Black, (int)(x), (int)(y), 3, 3);
@@ -63,16 +72,17 @@ namespace TohoSTG
 
         internal void move()
         {
+            // 弾の移動
             x += vx;
             y += vy;
             //throw new NotImplementedException();
         }
 
-        internal Boolean isFadeOut(int width, int height)
+        internal Boolean isFadeOut(int screenWidth, int screenHeight)
         {
-            if (x >= width) return true;
+            if (x >= screenWidth) return true;
             if (x < 0) return true;
-            if (y >= height) return true;
+            if (y >= screenHeight) return true;
             if (y < 0) return true;
             return false;
         }
