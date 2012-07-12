@@ -33,7 +33,7 @@ namespace TohoSTG
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分
 
-        public Enemy(double x, double y, double ivx, double ivy)
+        public Enemy(Bitmap ShipBMP, double x, double y, double ivx, double ivy)
         {
             this.x = x;
             this.y = y;
@@ -41,7 +41,8 @@ namespace TohoSTG
             this.ivy = ivy; // 初速y
             isAlive = true;
 
-            bmp = new Bitmap(BMPFileName);
+            bmp = ShipBMP;
+            //bmp = new Bitmap(BMPFileName);
             width = bmp.Width;
             height = bmp.Height;
             bmp.MakeTransparent();

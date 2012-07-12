@@ -8,7 +8,7 @@ namespace TohoSTG
 {
     class Jiki : Obj
     {
-        private const string BMPFileName = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\Jiki.bmp";
+        private const string BMPFileName = @"Jiki.bmp";
         private Bitmap bmp;
         private int width;
         private int height;
@@ -33,14 +33,16 @@ namespace TohoSTG
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分
 
-        public Jiki(double x, double y, int screenWidth, int screenHeight)
+        public Jiki(Bitmap ShipBMP, double x, double y, int screenWidth, int screenHeight)
         {
             this.x = x;
             this.y = y;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
 
-            bmp = new Bitmap(BMPFileName);
+            bmp = ShipBMP;
+            //bmp = new Bitmap(System.IO.Path.Combine(Application.StartupPath, BMPFileName));
+            //bmp = new Bitmap(BMPFileName);
             width = bmp.Width;
             height = bmp.Height;
             bmp.MakeTransparent();

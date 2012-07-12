@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using WMPLib;
+using System.IO;
 
 namespace TohoSTG
 {
@@ -22,22 +23,30 @@ namespace TohoSTG
         Jiki j1;
         WindowsMediaPlayer wmp;
 
-        private const int width = 479;
-        private const int height = 303;
+        //private const int width = 479;
+        //private const int height = 332; // pictureBox1.heightから取ってくる手もある
+        private int width;
+        private int height; // pictureBox1.heightから取ってくる手もある
         private Boolean isAlive;
         //private Dictionary<Keys, bool> isPressed;
         private PadState padState;
         private List<Enemy> enemies;
         const int INTERVAL = 33;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        
+        private const string BGMFilePath = "sht_a02.mp3";
+        private const string HaikeiFilePath = "space1_x2vertical.bmp";
+        private const string ShipFilePath = "Jiki.bmp";
         private int score;
         private int RotationPhase;
         //private DateTime t0;
         private List<TimeSpan> stagetime;
         private List<DateTime> startedTime;
+        private int scrollY;
 
         private void reset()
         {
-            j1 = new Jiki(240, 260, width, height);    // 初期位置はてきとー
+            Bitmap ShipBMP = new Bitmap(Path.Combine(Application.StartupPath, ShipFilePath));
+            j1 = new Jiki(ShipBMP, 240, 260, width, height);    // 初期位置はてきとー
             isAlive = true;
 
             score = 0;
@@ -67,16 +76,23 @@ namespace TohoSTG
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
 
+            width = pictureBox1.Width;
+            height = pictureBox1.Height;
+            scrollY = -height;
             bmp = new Bitmap(width, height);
-            haikei = new Bitmap(@"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\clippedGradiuss3_479x303.png");
+            //haikei = new Bitmap(@"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\clippedGradiuss3_479x303.png");
+            haikei = new Bitmap(System.IO.Path.Combine(Application.StartupPath, HaikeiFilePath));
+            
             g = Graphics.FromImage(bmp);
             r = new Random();
             pictureBox1.Image = bmp;
 
             wmp = new WindowsMediaPlayer();
 
-            wmp.URL = @"D:\Download\ByFirefox\gamebgmsozai\sht_a02.mp3";
-            wmp.settings.volume = 5;
+            //wmp.URL = System.IO.Path.Combine(Application.ExecutablePath, BGMFilePath);
+            wmp.URL = System.IO.Path.Combine(Application.StartupPath, BGMFilePath);
+            //wmp.URL = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\sound\sht_a02.mp3";
+            wmp.settings.volume = 7;
             wmp.settings.playCount = 0;
             wmp.settings.setMode("loop", true);
             wmp.controls.play();
@@ -110,7 +126,9 @@ namespace TohoSTG
             timer1.Stop();
             if (padState.押された(PadState.Buttons.reset)) reset();
             if (isAlive == false)
+                // プレーヤーは死亡中
             {
+
                 timer1.Start();
                 return;
             }
@@ -157,7 +175,8 @@ namespace TohoSTG
             // 敵の誕生
             {
                 int ix = r.Next(width + 32) - 24;
-                Enemy enemy = new Enemy(ix, -16, 0, 8);    // 引数は出現位置
+                Bitmap ShipBMP = new Bitmap(Path.Combine(Application.StartupPath, ShipFilePath));
+                Enemy enemy = new Enemy(ShipBMP, ix, -16, 0, 8);    // 引数は出現位置
                 enemies.Add(enemy);
             }
 
@@ -165,8 +184,11 @@ namespace TohoSTG
             //g.Clear(Color.Black);
             
             // TODO: 背景画像でテストプレイしにくいので要検討
-            //g.DrawImage(haikei, 0, 0);
-            g.Clear(Color.Black);
+            //Bitmap haikeiClipped = new Bitm
+            g.DrawImage(haikei, r.Next(3), scrollY);
+            scrollY++;
+            if (scrollY >= 0) scrollY = -height;
+            //g.Clear(Color.Black);
 
             //j1.move(isPressed);
 
@@ -196,6 +218,7 @@ namespace TohoSTG
                             isAlive = false;    // 死亡
                             //timer1.Enabled = false;
                             //timer1.Stop();
+                            g.DrawString("Zキーで再スタートしてもいいよ。", DefaultFont, Brushes.White, (width - 160) / 2, (height - 16) / 2);
                             break;
                             //Close();
                         }
@@ -281,7 +304,7 @@ namespace TohoSTG
             //this.Left = 900;
             //this.Top = 300;
             //Focus();
-            button1.Focus();
+            //button1.Focus();
             KeyPreview = true;
         }
 
