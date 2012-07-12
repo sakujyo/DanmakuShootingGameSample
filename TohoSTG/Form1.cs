@@ -42,6 +42,7 @@ namespace TohoSTG
         private List<TimeSpan> stagetime;
         private List<DateTime> startedTime;
         private int scrollY;
+        private const string MokuzuFilePath = "EnemyMokuzu.bmp";
 
         private void reset()
         {
@@ -228,7 +229,8 @@ namespace TohoSTG
                         {
                             if (bullet.inquire(enemy))
                             {
-                                enemy.die();
+                                Bitmap mokuzu = new Bitmap(Path.Combine(Application.StartupPath, MokuzuFilePath));
+                                enemy.die(mokuzu);
                                 score += 100;
                                 //stagetime[1 + score / 2000] = DateTime.Now - t0;
                             }

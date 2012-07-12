@@ -102,11 +102,12 @@ namespace TohoSTG
             //y += dy * d;
         }
     
-        internal void die()
+        internal void die(Bitmap MokuzuBMP)
         {
             isAlive = false;
             // TODO: 敵機を撃墜したのでBMPを差し替えるなど
-            bmp = new Bitmap(BMPMokuzuFileName);
+            bmp = MokuzuBMP;
+            //bmp = new Bitmap(BMPMokuzuFileName);
             bmp.MakeTransparent();
         }
 
