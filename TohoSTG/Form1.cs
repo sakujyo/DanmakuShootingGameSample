@@ -222,7 +222,9 @@ namespace TohoSTG
                 //width / 2, height / 2
                 int gy = (int)(height / 2 + /*keisu*/40 * Math.Cos(2 * Math.PI * RotationPhase / 60));
                 int gx = (int)(width  / 2 + /*keisu*/100 * Math.Sin(-2 * Math.PI * RotationPhase / 60));
+                RotationPhase++;
 
+                g.DrawRectangle(Pens.YellowGreen, gx, gy, 8, 8);
                 enemy.move(new Point(gx, gy));
                 enemy.draw(g);
             }
@@ -245,7 +247,7 @@ namespace TohoSTG
                 //TimeSpan thisstagetime = (startedTime[i] - startedTime[i - 1]) - new TimeSpan((startedTime[i] - startedTime[i - 1]).Milliseconds);
                 //string timestring = (startedTime[i] - startedTime[i - 1]).ToString();
                 //g.DrawString(String.Format("Stage {0}: {1}", i, timestring), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
-                g.DrawString(String.Format("Stage {0}: {1}", i, new TimeSpan(thisstagetime.Hours, thisstagetime.Minutes, thisstagetime.Seconds)), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
+                g.DrawString(String.Format("Stage {0}: {1}.{2}", i, new TimeSpan(thisstagetime.Hours, thisstagetime.Minutes, thisstagetime.Seconds), thisstagetime.Milliseconds.ToString("000")), DefaultFont, Brushes.White, width - 120, 16 + i * 16);
                 //g.DrawString((startedTime[i] - startedTime[i - 1]).ToString(), DefaultFont, Brushes.White, width - 160, 16 + i * 16);
 			}
             //foreach (var item in startedTime)

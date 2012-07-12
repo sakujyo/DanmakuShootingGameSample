@@ -82,10 +82,14 @@ namespace TohoSTG
             // ピタゴラスの定理
             int distanceSquare = dx * dx + dy * dy;
             //double d = Math.Sqrt(dx * dx + dy * dy);
-            if (distanceSquare == 0) distanceSquare = 1;    // ゼロ除算を防ぐため
-            ivx += -dx * gravity / distanceSquare;
-            ivy += -dy * gravity / distanceSquare;
 
+            // もくず(敵が撃墜された残骸)なら加速度処理は行わない
+            if (isAlive)
+            {
+                if (distanceSquare == 0) distanceSquare = 1;    // ゼロ除算を防ぐため
+                ivx += -dx * gravity / distanceSquare;
+                ivy += -dy * gravity / distanceSquare;
+            }
 
             //int dx = 1; // x方向の速度
             //int dy = 0; // y方向の速度

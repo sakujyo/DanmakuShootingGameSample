@@ -11,11 +11,11 @@ namespace TohoSTG
         private Dictionary<Buttons, bool> osaretaInt;
         internal enum Buttons
         {
-            left = System.Windows.Forms.Keys.A,
-            right = System.Windows.Forms.Keys.D,
-            up = System.Windows.Forms.Keys.W,
-            down = System.Windows.Forms.Keys.S,
-            button1 = System.Windows.Forms.Keys.Space,
+            left/* = System.Windows.Forms.Keys.A*/,
+            right/* = System.Windows.Forms.Keys.D*/,
+            up/* = System.Windows.Forms.Keys.W*/,
+            down/* = System.Windows.Forms.Keys.S*/,
+            button1/* = System.Windows.Forms.Keys.Space*/,
             //button2,
             reset,
         }
@@ -45,6 +45,7 @@ namespace TohoSTG
         }
 
         // ぼくたちはこの関数の名前をまだ知らない
+        // あえて命名するならpoll()?
         internal void funcA(Buttons b)
         {
             if (this[b] == false) osaretaInt[b] = true;
@@ -54,6 +55,7 @@ namespace TohoSTG
         internal void KeyDown(KeyEventArgs e)
         {
             if (e.KeyCode == System.Windows.Forms.Keys.A) funcA(Buttons.left);
+            //if (e.KeyCode == System.Windows.Forms.Keys.Left) funcA(Buttons.left);
             if (e.KeyCode == System.Windows.Forms.Keys.D) funcA(Buttons.right);
             if (e.KeyCode == System.Windows.Forms.Keys.W) funcA(Buttons.up);
             if (e.KeyCode == System.Windows.Forms.Keys.S) funcA(Buttons.down);
