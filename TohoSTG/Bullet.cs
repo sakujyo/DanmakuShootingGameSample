@@ -51,9 +51,29 @@ namespace TohoSTG
                 p = Pens.SkyBlue;
             }
             // 十字型の弾丸をプログラムで描画
-            g.DrawLine(p, (float)(x + 1), (float)(y), (float)(x + 1), (float)(y + 2));
-            g.DrawLine(p, (float)(x), (float)(y + 1), (float)(x + 2), (float)(y + 1));
-            g.DrawLine(Pens.White, (float)(x + 1), (float)(y + 1), (float)(x + 1), (float)(y + 1));
+            int tx = (int)x;
+            int ty = (int)y;
+            //g.DrawLine(p, (float)(x + 1), (float)(y), (float)(x + 1), (float)(y + 2));
+            //g.DrawLine(p, (float)(x), (float)(y + 1), (float)(x + 2), (float)(y + 1));
+
+            g.DrawLine(p, (float)(tx + 1), (float)(ty), (float)(tx + 1), (float)(ty + 2));
+            g.DrawLine(p, (float)(tx), (float)(ty + 1), (float)(tx + 2), (float)(ty + 1));
+
+
+            g.DrawLine(p, (float)(tx + 0), (float)(ty), (float)(tx + 0), (float)(ty + 2));
+            g.DrawLine(p, (float)(tx + 2), (float)(ty), (float)(tx + 2), (float)(ty + 2));
+            g.DrawLine(p, (float)(tx + 1), (float)(ty - 1), (float)(tx + 1), (float)(ty + 3));
+            g.DrawLine(p, (float)(tx), (float)(ty + 0), (float)(tx + 2), (float)(ty + 0));
+            g.DrawLine(p, (float)(tx), (float)(ty + 2), (float)(tx + 2), (float)(ty + 2));
+            g.DrawLine(p, (float)(tx - 1), (float)(ty + 1), (float)(tx + 3), (float)(ty + 1));
+            p = Pens.White;
+            g.DrawLine(p, (float)(tx + 1), (float)(ty), (float)(tx + 1), (float)(ty + 2));
+            g.DrawLine(p, (float)(tx), (float)(ty + 1), (float)(tx + 2), (float)(ty + 1));
+            //g.DrawLine(Pens.White, (float)(x + 1), (float)(y - 1), (float)(x + 1), (float)(y + 3));
+            //Graphicsはおそらくベクターグラフィックスとして使うべきであって、点は結果としては打たれない
+
+            //g.DrawLine(Pens.White, (float)(tx + 1), (float)(ty + 1), (float)(tx + 1), (float)(ty + 1));
+            
             
             //g.FillRectangle(Brushes.Black, (int)(x), (int)(y), 3, 3);
 

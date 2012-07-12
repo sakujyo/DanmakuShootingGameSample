@@ -9,6 +9,8 @@ namespace TohoSTG
     {
         protected double x;
         protected double y;
+        protected int width;
+        protected int height;
 
         public double X
         {
@@ -25,6 +27,20 @@ namespace TohoSTG
             }
         }
 
+        public int Width
+        {
+            get
+            {
+                return width;
+            }
+        }
+        public int Height
+        {
+            get
+            {
+                return height;
+            }
+        }
 
         //public double getX()
         //{
@@ -35,5 +51,11 @@ namespace TohoSTG
         //{
         //    return y;
         //}
+
+        internal int renderingX()
+        {
+            // this.xを中心とするように描画したいときの左上x座標の例
+            return (int)(x - width / 2);
+        }
     }
 }

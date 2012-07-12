@@ -10,25 +10,25 @@ namespace TohoSTG
     {
         private const string BMPFileName = @"Jiki.bmp";
         private Bitmap bmp;
-        private int width;
-        private int height;
+        //private int width;
+        //private int height;
         private int screenWidth;
         private int screenHeight;
 
-        public int Width
-        {
-            get
-            {
-                return width;
-            }
-        }
-        public int Height
-        {
-            get
-            {
-                return height;
-            }
-        }
+        //public int Width
+        //{
+        //    get
+        //    {
+        //        return width;
+        //    }
+        //}
+        //public int Height
+        //{
+        //    get
+        //    {
+        //        return height;
+        //    }
+        //}
         
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分

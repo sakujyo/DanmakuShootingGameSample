@@ -8,27 +8,27 @@ namespace TohoSTG
 {
     class Enemy : Obj
     {
-        private const string BMPFileName = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\Jiki.bmp";
-        private const string BMPMokuzuFileName = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\EnemyMokuzu.bmp";
+        //private const string BMPFileName = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\Jiki.bmp";
+        //private const string BMPMokuzuFileName = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\image\EnemyMokuzu.bmp";
         private Bitmap bmp;
-        private int width;
-        private int height;
+        //private int width;
+        //private int height;
         private double ivx;
         private double ivy;
-        public int Width
-        {
-            get
-            {
-                return width;
-            }
-        }
-        public int Height
-        {
-            get
-            {
-                return height;
-            }
-        }
+        //public int Width
+        //{
+        //    get
+        //    {
+        //        return width;
+        //    }
+        //}
+        //public int Height
+        //{
+        //    get
+        //    {
+        //        return height;
+        //    }
+        //}
         
         //private int dx;         // Tickごとの自機のx座標の増分
         //private int dy;         // Tickごとの自機のy座標の増分
@@ -50,7 +50,32 @@ namespace TohoSTG
 
         internal void draw(Graphics g)
         {
+            
             g.DrawImage(bmp, (int)(x), (int)(y));
+        }
+
+        internal void fade(Bitmap haikei, int scrollY)
+        {
+            for (int y = 0; y < bmp.Height; y++)
+            {
+                for (int x = 0; x < bmp.Width; x++)
+                {
+                    // 透過色は保存する
+                    var tp = bmp.GetPixel(0, height - 1);   // 左下ピクセル
+                    var p = bmp.GetPixel(x, y);
+                    if ((int)(this.x) + x < 0) continue;
+                    if ((int)(this.x) + x >= haikei.Width) continue;
+                    if ((int)(this.y) + y -scrollY < 0) continue;
+                    if ((int)(this.y) + y - scrollY >= haikei.Height) continue;
+                    var hp = haikei.GetPixel((int)(this.x) + x, (int)(this.y) + y -scrollY);
+                    //var cc = new ColorConverter();
+                    var np = Color.FromArgb(p.R * (fadeCount - 1) / fadeCount + hp.R / fadeCount, p.G * (fadeCount - 1) / fadeCount + hp.G / fadeCount, p.B * (fadeCount - 1) / fadeCount + hp.B / fadeCount);
+                    if (p == tp) continue;  // 対象ピクセルが透過色だった場合にはブレンドしない
+                    bmp.SetPixel(x, y, np);
+                }
+            }
+            fadeCount--;
+            if (fadeCount == 0) isDesappeared = true;
         }
 
         internal Boolean judge(double x, double y)
@@ -91,6 +116,12 @@ namespace TohoSTG
                 ivx += -dx * gravity / distanceSquare;
                 ivy += -dy * gravity / distanceSquare;
             }
+            else
+            {
+                ivx = 0;
+                ivy = 1;
+                // こうするなら一定時間経過後にオブジェクトを破棄する必要がある
+            }
 
             //int dx = 1; // x方向の速度
             //int dy = 0; // y方向の速度
@@ -101,17 +132,39 @@ namespace TohoSTG
             //x += dx * d;
             //y += dy * d;
         }
-    
+
+        internal void die()
+        {
+            isAlive = false;
+            // TODO: 敵機を撃墜したのでBMPを差し替えるなど
+            //bmp = new Bitmap(BMPMokuzuFileName);
+            //bmp = MokuzuBMP;
+            //bmp.MakeTransparent();
+
+            fadeCount = 40;
+        }
+
         internal void die(Bitmap MokuzuBMP)
         {
             isAlive = false;
             // TODO: 敵機を撃墜したのでBMPを差し替えるなど
-            bmp = MokuzuBMP;
             //bmp = new Bitmap(BMPMokuzuFileName);
-            bmp.MakeTransparent();
+            //bmp = MokuzuBMP;
+            //bmp.MakeTransparent();
+
+            fadeCount = 40;
         }
 
         protected bool isAlive;
+        private int fadeCount;
+        private bool isDesappeared = false;
+        public bool IsDesappeared
+        {
+            get
+            {
+                return isDesappeared;
+            }
+        }
         public bool IsAlive { get { return isAlive; } }
 
         internal bool isFadeOut(int screenWidth, int screenHeight)

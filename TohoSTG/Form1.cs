@@ -31,7 +31,8 @@ namespace TohoSTG
         //private Dictionary<Keys, bool> isPressed;
         private PadState padState;
         private List<Enemy> enemies;
-        const int INTERVAL = 33;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        //const int INTERVAL = 33;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        const int INTERVAL = 16;    // (INTERVAL + a) * 30 = 1000あたりを狙う
         
         private const string BGMFilePath = "sht_a02.mp3";
         private const string HaikeiFilePath = "space1_x2vertical.bmp";
@@ -41,8 +42,11 @@ namespace TohoSTG
         //private DateTime t0;
         private List<TimeSpan> stagetime;
         private List<DateTime> startedTime;
+        // 縦に高さheightの2枚分が連結された背景画像をY=-heightから描画し始めて、2倍丈画像の下半分から上半分までをスライドして表示させるときの描画Y座標
         private int scrollY;
-        private const string MokuzuFilePath = "EnemyMokuzu.bmp";
+        //private const string MokuzuFilePath = "EnemyMokuzu.bmp";
+        private WindowsMediaPlayer wmp2;
+        private const string SEShotFilePath = "se_breakout_1.mp3";
 
         private void reset()
         {
@@ -89,12 +93,15 @@ namespace TohoSTG
             pictureBox1.Image = bmp;
 
             wmp = new WindowsMediaPlayer();
+            wmp2 = new WindowsMediaPlayer();
 
             //wmp.URL = System.IO.Path.Combine(Application.ExecutablePath, BGMFilePath);
             wmp.URL = System.IO.Path.Combine(Application.StartupPath, BGMFilePath);
+            wmp2.URL = System.IO.Path.Combine(Application.StartupPath, SEShotFilePath);
             //wmp.URL = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\sound\sht_a02.mp3";
             wmp.settings.volume = 7;
-            wmp.settings.playCount = 0;
+            wmp2.settings.volume = 7;
+            //wmp.settings.playCount = 0;
             wmp.settings.setMode("loop", true);
             wmp.controls.play();
 
@@ -157,9 +164,9 @@ namespace TohoSTG
 
                 //int num = 17;
                 //int num = 37;
-                int num = 29;
+                int num = 29;               // 同心円状に放射する弾丸の数
+
                 //double constant = 1.5;  // 弾丸の速度
-                
                 //double constant = 6;  // 弾丸の速度
                 double constant = 4 + r.Next(4);  // 弾丸の速度、ばらつきを持たせてみた
                 
@@ -172,8 +179,9 @@ namespace TohoSTG
                     b.draw(this, g);
                 }
             }
-            if (r.Next(20) == 0)
+
             // 敵の誕生
+            if (r.Next(20) == 0)
             {
                 int ix = r.Next(width + 32) - 24;
                 Bitmap ShipBMP = new Bitmap(Path.Combine(Application.StartupPath, ShipFilePath));
@@ -181,10 +189,11 @@ namespace TohoSTG
                 enemies.Add(enemy);
             }
 
+            // 背景の描画
+            // TODO: 背景画像でテストプレイしにくいので要検討
             //g.Clear(Color.White);
             //g.Clear(Color.Black);
             
-            // TODO: 背景画像でテストプレイしにくいので要検討
             //Bitmap haikeiClipped = new Bitm
             g.DrawImage(haikei, r.Next(3), scrollY);
             scrollY++;
@@ -193,13 +202,21 @@ namespace TohoSTG
 
             //j1.move(isPressed);
 
-            if (padState.押された(PadState.Buttons.button1))
+
+            // 自機の攻撃
+            if (padState.押された(PadState.Buttons.button1))    // 連射オフの場合の条件式
+            //if (padState.osareteru(PadState.Buttons.button1))   // 連射させる場合の条件式
             {
-                int myBulletSpeed = -8;
+                wmp2.controls.stop();
+                wmp2.controls.play();
+                //int myBulletSpeed = -8;
+                int myBulletSpeed = -12;
                 Bullet b = new Bullet(Bullet.Sides.mikata, j1.X + j1.Width / 2, j1.Y, 0, myBulletSpeed);
                 bullets.Add(b);
                 padState.clearPressed(PadState.Buttons.button1);
             }
+
+            // 自機の移動と描画
             j1.move(padState);
             j1.draw(g);
 
@@ -210,6 +227,20 @@ namespace TohoSTG
                 //bullet.move(new Point(width / 2, height / 2));
                 bullet.move();
                 bullet.draw(this, g);
+                int bx = (int)bullet.X + 1;
+                int by = (int)bullet.Y + 1;
+                if ((bx >= 0)&&(bx < width)&&(by >= 0)&&(by < height))
+                {
+                    bmp.SetPixel(bx, by, Color.White);
+                }                
+                //try
+                //{
+                //    bmp.SetPixel((int)(bullet.X), (int)(bullet.Y), Color.White);
+                //}
+                //catch (Exception)
+                //{
+                //    //throw;
+                //}
                 switch (bullet.Side)
                 {
                     case Bullet.Sides.teki:
@@ -229,8 +260,9 @@ namespace TohoSTG
                         {
                             if (bullet.inquire(enemy))
                             {
-                                Bitmap mokuzu = new Bitmap(Path.Combine(Application.StartupPath, MokuzuFilePath));
-                                enemy.die(mokuzu);
+                                //Bitmap mokuzu = new Bitmap(Path.Combine(Application.StartupPath, MokuzuFilePath));
+                                //enemy.die(mokuzu);
+                                enemy.die();
                                 score += 100;
                                 //stagetime[1 + score / 2000] = DateTime.Now - t0;
                             }
@@ -242,6 +274,7 @@ namespace TohoSTG
             }
             bullets.RemoveAll(x => x.isFadeOut(width, height));
 
+            // 敵の移動と描画
             foreach (var enemy in enemies)
             {
                 //width / 2, height / 2
@@ -249,11 +282,15 @@ namespace TohoSTG
                 int gx = (int)(width  / 2 + /*keisu*/100 * Math.Sin(-2 * Math.PI * RotationPhase / 60));
                 RotationPhase++;
 
-                g.DrawRectangle(Pens.YellowGreen, gx, gy, 8, 8);
+                // 重力源の表示
+                //g.DrawRectangle(Pens.YellowGreen, gx, gy, 8, 8);
+                if (enemy.IsAlive == false) enemy.fade(haikei, scrollY);
                 enemy.move(new Point(gx, gy));
                 enemy.draw(g);
             }
+            // 画面外に大幅に出て行った時と、撃墜されて画像の描画も終わった時にオブジェクトを取り除く
             enemies.RemoveAll(x => x.isFadeOut(width, height));
+            enemies.RemoveAll(x => x.IsDesappeared);
 
             g.DrawString(score.ToString(), DefaultFont, Brushes.White, 16, height - 32);
 
