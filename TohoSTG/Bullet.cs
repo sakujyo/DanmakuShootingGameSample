@@ -43,6 +43,10 @@ namespace TohoSTG
             }
         }
 
+        private const int zanzoun = 10;
+        int[] oldx = new int[zanzoun];
+        int[] oldy = new int[zanzoun];
+
         //public Bullet(double x, double y, double vx, double vy) : this(Side.teki, x, y, vx, vy)
         //{
         //}
@@ -105,8 +109,40 @@ namespace TohoSTG
                 p = Pens.SkyBlue;
             }
             // 十字型の弾丸をプログラムで描画
-            int tx = (int)x;
-            int ty = (int)y;
+            
+            int tx;
+            int ty;
+            if (ugokikata == Bullet.Ugokikata.Drill)
+            {
+                Pen p0 = p;
+                Color c0 = p0.Color;
+                Color c1 = Color.White;
+                for (int i = zanzoun - 1; i >= 0; i--)
+                {
+                    c0 = Color.FromArgb(c0.R * i / (i + 1), c0.G * i / (i + 1), c0.B * i / (i + 1));
+                    c1 = Color.FromArgb(c1.R * i / (i + 1), c1.G * i / (i + 1), c1.B * i / (i + 1));
+                    p = new Pen(c0);
+                    tx = oldx[zanzoun - 1 - i];
+                    ty = oldy[zanzoun - 1 - i];
+                    g.DrawLine(p, (float)(tx + 1), (float)(ty), (float)(tx + 1), (float)(ty + 2));
+                    g.DrawLine(p, (float)(tx), (float)(ty + 1), (float)(tx + 2), (float)(ty + 1));
+
+                    g.DrawLine(p, (float)(tx + 0), (float)(ty), (float)(tx + 0), (float)(ty + 2));
+                    g.DrawLine(p, (float)(tx + 2), (float)(ty), (float)(tx + 2), (float)(ty + 2));
+                    g.DrawLine(p, (float)(tx + 1), (float)(ty - 1), (float)(tx + 1), (float)(ty + 3));
+                    g.DrawLine(p, (float)(tx), (float)(ty + 0), (float)(tx + 2), (float)(ty + 0));
+                    g.DrawLine(p, (float)(tx), (float)(ty + 2), (float)(tx + 2), (float)(ty + 2));
+                    g.DrawLine(p, (float)(tx - 1), (float)(ty + 1), (float)(tx + 3), (float)(ty + 1));
+                    Pen p2 = new Pen(c1);
+                    g.DrawLine(p2, (float)(tx + 1), (float)(ty), (float)(tx + 1), (float)(ty + 2));
+                    g.DrawLine(p2, (float)(tx), (float)(ty + 1), (float)(tx + 2), (float)(ty + 1));
+                }
+                p = p0; // 退避したものを戻す
+            }
+
+            /* int */tx = (int)x;
+            /* int */ty = (int)y;
+                    
             //g.DrawLine(p, (float)(x + 1), (float)(y), (float)(x + 1), (float)(y + 2));
             //g.DrawLine(p, (float)(x), (float)(y + 1), (float)(x + 2), (float)(y + 1));
 
@@ -181,6 +217,15 @@ namespace TohoSTG
 
                     x += vx * d;
                     y += vy * d;
+
+                    // 残像のための座標の記録
+                    for (int i = zanzoun - 1; i > 0; i--)
+                    {
+                        oldx[i] = oldx[i - 1];
+                        oldy[i] = oldy[i - 1];
+                    }
+                    oldx[0] = (int)x;
+                    oldy[0] = (int)y;
 
                     // 重力源の移動
                     gx += vgx;

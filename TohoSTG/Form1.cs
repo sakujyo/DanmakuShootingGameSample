@@ -49,6 +49,9 @@ namespace TohoSTG
         //private const string MokuzuFilePath = "EnemyMokuzu.bmp";
         private WindowsMediaPlayer wmp2;
         private const string SEShotFilePath = "se_breakout_1.mp3";
+        //private int shotCount;
+        private List<DateTime> shotTimeStamps;
+        private int maxCountPerSec;
 
         private void reset()
         {
@@ -71,6 +74,9 @@ namespace TohoSTG
             timer1.Interval = INTERVAL;   // ミリ秒
             stagetime = new List<TimeSpan>();
             startedTime = new List<DateTime>();
+            shotTimeStamps = new List<DateTime>();
+            //shotCount = 0;
+            maxCountPerSec = 0;
             startedTime.Add(DateTime.Now);
             //startedTime[0] = DateTime.Now;    // まだないなら変更できない
             //t0 = DateTime.Now;
@@ -238,6 +244,11 @@ namespace TohoSTG
                 Bullet b = new Bullet(Bullet.Sides.mikata, j1.X + j1.Width / 2, j1.Y, 0, myBulletSpeed);
                 bullets.Add(b);
                 padState.clearPressed(PadState.Buttons.button1);
+                
+                shotTimeStamps.Add(DateTime.Now);
+                //shotCount++;
+                //TimeSpan keikaByousu = DateTime.Now - startedTime[0];
+                //if (keikaByousu.TotalSeconds
             }
 
             // 自機の移動と描画
@@ -357,6 +368,22 @@ namespace TohoSTG
             //b2.zanzou(this, g);
             //b2.move();
             //b2.draw(this, g);
+
+            Font font0 = DefaultFont;
+            Font font = new Font("Roman", 18);
+            //string s1 = startedTime[0].ToString();
+            int shotCount = shotTimeStamps.FindAll(t => t >= DateTime.Now - TimeSpan.FromSeconds(1)).Count;
+            if (maxCountPerSec < shotCount) maxCountPerSec = shotCount;
+            //int maxCountPerSec = 0;
+            //if (shotTimeStamps.Count > 0)
+            //{
+            //    maxCountPerSec = shotTimeStamps.GroupBy(t => (int)((t - startedTime[0]).TotalSeconds)).Select(x => x.Count()).Max();
+            //}
+            string sc = shotCount.ToString();
+            g.DrawString(sc, font, Brushes.Gray, 16, 16);
+            g.DrawString(sc, font, Brushes.White, 17, 17);
+            g.DrawString(maxCountPerSec.ToString(), font, Brushes.Gray, 16, 48);
+            g.DrawString(maxCountPerSec.ToString(), font, Brushes.White, 17, 49);
 
             Refresh();
 
