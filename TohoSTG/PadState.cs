@@ -62,7 +62,8 @@ namespace TohoSTG
                 e.KeyCode == System.Windows.Forms.Keys.X) funcA(Buttons.down);
             //if (e.KeyCode == System.Windows.Forms.Keys.ShiftKey) funcA(Buttons.button1);
             //if (e.KeyCode == System.Windows.Forms.Keys.S) funcA(Buttons.button1);
-            if (e.KeyCode == System.Windows.Forms.Keys.S) funcA(Buttons.button1);
+            if (e.KeyCode == System.Windows.Forms.Keys.S ||
+                e.KeyCode == System.Windows.Forms.Keys.Space) funcA(Buttons.button1);
             //if (e.KeyCode == System.Windows.Forms.Keys.Space) funcA(Buttons.button1);
             if (e.KeyCode == System.Windows.Forms.Keys.Z) funcA(Buttons.reset);
         }
@@ -75,7 +76,8 @@ namespace TohoSTG
             if (e.KeyCode == System.Windows.Forms.Keys.X ||
                 e.KeyCode == System.Windows.Forms.Keys.X) this[Buttons.down] = false;
             //if (e.KeyCode == System.Windows.Forms.Keys.ShiftKey) this[Buttons.button1] = false;
-            if (e.KeyCode == System.Windows.Forms.Keys.S) this[Buttons.button1] = false;
+            if (e.KeyCode == System.Windows.Forms.Keys.S ||
+                e.KeyCode == System.Windows.Forms.Keys.Space) this[Buttons.button1] = false;
             //if (e.KeyCode == System.Windows.Forms.Keys.Space) this[Buttons.button1] = false;
             if (e.KeyCode == System.Windows.Forms.Keys.Z) this[Buttons.reset] = false;
         }

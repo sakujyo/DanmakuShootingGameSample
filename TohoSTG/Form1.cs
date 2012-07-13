@@ -32,10 +32,12 @@ namespace TohoSTG
         private PadState padState;
         private List<Enemy> enemies;
         //const int INTERVAL = 33;    // (INTERVAL + a) * 30 = 1000あたりを狙う
-        const int INTERVAL = 16;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        //const int INTERVAL = 16;    // (INTERVAL + a) * 30 = 1000あたりを狙う
+        const int INTERVAL = 32;    // (INTERVAL + a) * 30 = 1000あたりを狙う
         
         private const string BGMFilePath = "sht_a02.mp3";
-        private const string HaikeiFilePath = "space1_x2vertical.bmp";
+        //private const string HaikeiFilePath = "space1_x2vertical.bmp";
+        private const string HaikeiFilePath = "space1_x2vertical.png";
         private const string ShipFilePath = "Jiki.bmp";
         private int score;
         private int RotationPhase;
@@ -165,18 +167,40 @@ namespace TohoSTG
                 //int num = 17;
                 //int num = 37;
                 int num = 29;               // 同心円状に放射する弾丸の数
+                int num2 = 1;               // ドリル状に放射する弾丸の数
 
                 //double constant = 1.5;  // 弾丸の速度
                 //double constant = 6;  // 弾丸の速度
                 double constant = 4 + r.Next(4);  // 弾丸の速度、ばらつきを持たせてみた
-                
-                for (int i = 0; i < num; i++)
+
+                //if (/* r.Next(2) == 0 && */ r.Next(5) < startedTime.Count - 2)
+                //if (/* r.Next(2) == 0 && */ r.Next(5) >= startedTime.Count - 2)
+                if (/* r.Next(2) == 0 && */ r.Next((startedTime.Count + 1) / 2 + 1) >= 2)  // {3, 4, 5, 6} / 2 = {1, 2, 2, 3} 
                 {
-                    //Bullet b = new Bullet(150, 100, Math.Pow(-1.0, (double)i), 2.7);
-                    //Bullet b = new Bullet(x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
-                    Bullet b = new Bullet(Bullet.Sides.teki, x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
-                    bullets.Add(b);
-                    b.draw(this, g);
+                    for (int i = 0; i < num; i++)
+                    {
+                        //Bullet b = new Bullet(150, 100, Math.Pow(-1.0, (double)i), 2.7);
+                        //Bullet b = new Bullet(x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
+                        Bullet b = new Bullet(Bullet.Ugokikata.Concentric, Bullet.Sides.teki, x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant, j1.X, j1.Y, constant);
+                        //Bullet b = new Bullet(Bullet.Sides.teki, x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
+                        bullets.Add(b);
+                        b.draw(this, g);
+                    }
+                }
+                else
+                {
+                    Bullet b0 = new Bullet(Bullet.Ugokikata.Sighting, Bullet.Sides.teki, x, y, 0, 0, j1.X, j1.Y, constant);
+                    bullets.Add(b0);
+                    b0.draw(this, g);
+                    for (int i = 0; i < num2; i++)
+                    {
+                        //Bullet b = new Bullet(150, 100, Math.Pow(-1.0, (double)i), 2.7);
+                        //Bullet b = new Bullet(x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
+                        Bullet b = new Bullet(Bullet.Ugokikata.Drill, Bullet.Sides.teki, x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant, j1.X, j1.Y, constant);
+                        //Bullet b = new Bullet(Bullet.Sides.teki, x, y, Math.Cos(Math.PI * 2 * i / num) * constant, -Math.Sin(Math.PI * 2 * i / num) * constant);
+                        bullets.Add(b);
+                        b.draw(this, g);
+                    }
                 }
             }
 
@@ -294,14 +318,16 @@ namespace TohoSTG
 
             g.DrawString(score.ToString(), DefaultFont, Brushes.White, 16, height - 32);
 
-            int localStageConstant = 2000;
+            int localStageConstant = 1000;
             if (startedTime.Count > 1 + score / localStageConstant)
             {
                 startedTime[1 + score / localStageConstant] = DateTime.Now;
             }
             else
             {
+                // 20機など倒して次のステージに進んだ
                 startedTime.Add(DateTime.Now);
+                timer1.Interval -= 4;   // fpsをあげる
             }
             for (int i = 1; i < startedTime.Count; i++)
 			{
