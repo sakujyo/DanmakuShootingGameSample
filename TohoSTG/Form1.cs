@@ -17,6 +17,7 @@ namespace TohoSTG
         Bitmap haikei;          // 背景宇宙
         Graphics g;
         List<Bullet> bullets;  // 弾幕プールの1グループ
+        List<string> messages;  // 妹のコメント
         //Bullet b1;      // とりあえずなんだからね！
         //Bullet b2;      // とりあえずなんだからね！
         Random r;
@@ -48,10 +49,19 @@ namespace TohoSTG
         private int scrollY;
         //private const string MokuzuFilePath = "EnemyMokuzu.bmp";
         private WindowsMediaPlayer wmp2;
-        private const string SEShotFilePath = "se_breakout_1.mp3";
+        //private const string SEShotFilePath = "se_breakout_1.mp3";
+        private const string SEShotFilePath = "Laser_Shoot2.wav";
         //private int shotCount;
         private List<DateTime> shotTimeStamps;
+        private List<DateTime> tickTimeStamps;
         private int maxCountPerSec;
+        private bool isRestInterval;
+        private const string NantokaGirl1filepath = "NantokaGirl1.png";
+        private Bitmap bn;
+        private Bitmap bn0; // 休憩の残り時間を表示する前の画面のキャプチャー
+        private System.Drawing.Font font;
+        private int fadeinCount;
+        private int midx;
 
         private void reset()
         {
@@ -75,8 +85,13 @@ namespace TohoSTG
             stagetime = new List<TimeSpan>();
             startedTime = new List<DateTime>();
             shotTimeStamps = new List<DateTime>();
+            tickTimeStamps = new List<DateTime>();
             //shotCount = 0;
             maxCountPerSec = 0;
+            isRestInterval = false;
+            bn = new Bitmap(System.IO.Path.Combine(Application.StartupPath, NantokaGirl1filepath));
+            midx = r.Next(messages.Count);
+
             startedTime.Add(DateTime.Now);
             //startedTime[0] = DateTime.Now;    // まだないなら変更できない
             //t0 = DateTime.Now;
@@ -99,6 +114,14 @@ namespace TohoSTG
             g = Graphics.FromImage(bmp);
             r = new Random();
             pictureBox1.Image = bmp;
+            font = new Font("Roman", 18);
+            messages = new List<string>();
+            messages.Add("うまくやったつもり？");
+            messages.Add("この服でいいんだよね？");
+            messages.Add("あきらめないで…っ！");
+            messages.Add("とうとうヒッグス粒子の秘密を？");
+            messages.Add("エアコンの設定は大丈夫？");
+
 
             wmp = new WindowsMediaPlayer();
             wmp2 = new WindowsMediaPlayer();
@@ -107,8 +130,11 @@ namespace TohoSTG
             wmp.URL = System.IO.Path.Combine(Application.StartupPath, BGMFilePath);
             wmp2.URL = System.IO.Path.Combine(Application.StartupPath, SEShotFilePath);
             //wmp.URL = @"C:\Users\s\Documents\Visual Studio 2010\Projects\TohoSTG\TohoSTG\sound\sht_a02.mp3";
+            wmp.controls.stop();
             wmp.settings.volume = 7;
-            wmp2.settings.volume = 7;
+            //wmp2.settings.volume = 0;
+            wmp2.controls.stop();
+            wmp2.settings.volume = 30;
             //wmp.settings.playCount = 0;
             wmp.settings.setMode("loop", true);
             wmp.controls.play();
@@ -140,7 +166,44 @@ namespace TohoSTG
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Stop();
+            tickTimeStamps.Add(DateTime.Now);
             if (padState.押された(PadState.Buttons.reset)) reset();
+            if (isRestInterval == true)
+            {
+                if (padState.押された(PadState.Buttons.start))
+                {
+                    isRestInterval = false;
+                }
+                // 休憩のためのインターバル
+                if ((DateTime.Now - startedTime[4]).TotalSeconds < 180)
+                {
+                    bn.MakeTransparent();
+                    g.DrawImage(bn0, 0, 0);
+                    g.DrawImage(bn, fadeinCount, height - bn.Height);
+                    if (fadeinCount > 310)
+                    {
+                        fadeinCount -= 2;
+                    }
+                    else
+                    {
+                        string message = "お兄ちゃん…";
+                        g.DrawString(message, font, Brushes.Gray, 40, 30);
+                        g.DrawString(message, font, Brushes.White, 41, 31);
+                        g.DrawString(messages[midx], font, Brushes.Gray, 40, 70);
+                        g.DrawString(messages[midx], font, Brushes.White, 41, 71);
+                    }
+                    timer1.Start();
+                    string restTime = ((int)(180 - (DateTime.Now - startedTime[4]).TotalSeconds)).ToString();
+                    g.DrawString(restTime, font, Brushes.Gray, width / 2 - 12, height / 2 - 8);
+                    g.DrawString(restTime, font, Brushes.White, width / 2 - 11, height / 2 - 7);
+                    Refresh();
+                    return;
+                }
+                else
+                {
+                    isRestInterval = false;
+                }
+            }
             if (isAlive == false)
                 // プレーヤーは死亡中
             {
@@ -338,7 +401,25 @@ namespace TohoSTG
             {
                 // 20機など倒して次のステージに進んだ
                 startedTime.Add(DateTime.Now);
-                timer1.Interval -= 4;   // fpsをあげる
+                if (startedTime.Count() == 6)
+                {
+                    isRestInterval = true;
+                    fadeinCount = width - 1;
+                    bn0 = new Bitmap(bmp);
+                    for (int x = 30; x < 300; x++)
+                    {
+                        for (int y = 20; y < 140; y++)
+                        {
+                            Color c = bn0.GetPixel(x, y);
+                            Color cnew = Color.FromArgb(c.R / 2, c.G / 2, c.B / 2);
+                            bn0.SetPixel(x, y, cnew);
+                        }   
+                    }
+                }
+                if (timer1.Interval > 3)
+                {
+                    timer1.Interval -= 3;   // fpsをあげる
+                }
             }
             for (int i = 1; i < startedTime.Count; i++)
 			{
@@ -369,10 +450,9 @@ namespace TohoSTG
             //b2.move();
             //b2.draw(this, g);
 
-            Font font0 = DefaultFont;
-            Font font = new Font("Roman", 18);
             //string s1 = startedTime[0].ToString();
             int shotCount = shotTimeStamps.FindAll(t => t >= DateTime.Now - TimeSpan.FromSeconds(1)).Count;
+            int ticksPerSecond = tickTimeStamps.FindAll(t => t >= DateTime.Now - TimeSpan.FromSeconds(1)).Count;
             if (maxCountPerSec < shotCount) maxCountPerSec = shotCount;
             //int maxCountPerSec = 0;
             //if (shotTimeStamps.Count > 0)
@@ -380,10 +460,13 @@ namespace TohoSTG
             //    maxCountPerSec = shotTimeStamps.GroupBy(t => (int)((t - startedTime[0]).TotalSeconds)).Select(x => x.Count()).Max();
             //}
             string sc = shotCount.ToString();
+            string st = ticksPerSecond.ToString() + " fps";
             g.DrawString(sc, font, Brushes.Gray, 16, 16);
             g.DrawString(sc, font, Brushes.White, 17, 17);
             g.DrawString(maxCountPerSec.ToString(), font, Brushes.Gray, 16, 48);
             g.DrawString(maxCountPerSec.ToString(), font, Brushes.White, 17, 49);
+            g.DrawString(st, font, Brushes.Gray, 16, 80);
+            g.DrawString(st, font, Brushes.White, 17, 81);
 
             Refresh();
 
